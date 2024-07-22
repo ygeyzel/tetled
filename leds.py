@@ -1,5 +1,4 @@
-from collections import namedtuple
-from typing import Tuple, NewType
+from typing import List, Tuple, NewType
 
 import neopixel
 
@@ -7,6 +6,10 @@ import neopixel
 Position = NewType('Position', Tuple[int, int])
 HsvColour = NewType('HsvColour', Tuple[int, int, int])
 RgbColour = NewType('RgbColour', Tuple[int, int, int])
+
+
+def _is_position_out_of_range(pos: Position, top_left: Position, bottom_right: Position) -> bool:
+    return any(pos[i] not in range(top_left[i], bottom_right[i]) for i in (0, 1))
 
 
 def _hsv_to_rgb(hsv: HsvColour) -> RgbColour:
@@ -40,6 +43,10 @@ class DualMatrix:
 
         self._leds = neopixel.NeoPixel(din_pin, self.leds_num)
 
+    @property
+    def dimensions(self) -> Position:
+        return (self.max_x, self.max_y)
+
     def _get_linear_position(self, position: Position) -> int:
         x, y = position
         if x >= self.matrix_max_x:
@@ -52,9 +59,37 @@ class DualMatrix:
         return x + (y * self.matrix_max_x)
 
     def __setitem__(self, index: Position, value: HsvColour):
+        if _is_position_out_of_range(index, (0, 0), self.dimensions):
+            raise ValueError(
+                f"Position {index} is out of matrix boundreis - {self.max_x, self.max_y}")
         linear_position = self._get_linear_position(index)
         rgb = _hsv_to_rgb(value)
         self._leds[linear_position] = rgb
 
     def clear(self):
         self._leds.fill((0, 0, 0))
+
+    def create_canvas(self, top_left_corner: Position, bottom_right_corner: Position) -> 'Canvas':
+        return Canvas(self, top_left_corner, bottom_right_corner)
+
+
+class Canvas:
+    def __init__(self, matrix: DualMatrix, top_left_corner: Position, bottom_right_corner: Position):
+        if _is_position_out_of_range(top_left_corner, (0, 0), bottom_right_corner) or _is_position_out_of_range(bottom_right_corner, top_left_corner, matrix.dimensions):
+            raise ValueError(
+                f"Invalid canvas dimensions {top_left_corner, bottom_right_corner} for matrix dimensions {matrix.dimensions}")
+        self._matrix = matrix
+        self.top_left_corner = top_left_corner
+        self.bottom_right_corner = bottom_right_corner
+        self.max_x, self.max_y = [self.bottom_right_corner[i] - self.top_left_corner[i] for i in (0, 1)]
+
+    @property
+    def dimensions(self) -> Position:
+        return (self.max_x, self.max_y)
+
+    def __setitem__(self, index: Position, value: HsvColour):
+        if _is_position_out_of_range(index, (0, 0), self.dimensions):
+            raise ValueError(
+                f"Position {index} is out of canvas boundreis - {self.max_x, self.max_y}")
+        self._matrix[[index[i] + self.top_left_corner[i] for i in (0, 1)]] = value
+
