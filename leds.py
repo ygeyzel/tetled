@@ -1,11 +1,6 @@
-from typing import Tuple, NewType
-
 import neopixel
 
-
-Position = NewType('Position', Tuple[int, int])
-HsvColor = NewType('HsvColor', Tuple[int, int, int])
-RgbColor = NewType('RgbColor', Tuple[int, int, int])
+from .common import Position, HsvColor, RgbColor
 
 
 def _is_position_out_of_range(pos: Position, top_left: Position, bottom_right: Position) -> bool:
