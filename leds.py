@@ -1,18 +1,18 @@
-from typing import List, Tuple, NewType
+from typing import Tuple, NewType
 
 import neopixel
 
 
 Position = NewType('Position', Tuple[int, int])
-HsvColour = NewType('HsvColour', Tuple[int, int, int])
-RgbColour = NewType('RgbColour', Tuple[int, int, int])
+HsvColor = NewType('HsvColor', Tuple[int, int, int])
+RgbColor = NewType('RgbColor', Tuple[int, int, int])
 
 
 def _is_position_out_of_range(pos: Position, top_left: Position, bottom_right: Position) -> bool:
     return any(pos[i] not in range(top_left[i], bottom_right[i]) for i in (0, 1))
 
 
-def _hsv_to_rgb(hsv: HsvColour) -> RgbColour:
+def _hsv_to_rgb(hsv: HsvColor) -> RgbColor:
     h, s, v = hsv
     c = v * s
     h0 = h / 60
@@ -58,7 +58,7 @@ class DualMatrix:
 
         return x + (y * self.matrix_max_x)
 
-    def __setitem__(self, index: Position, value: HsvColour):
+    def __setitem__(self, index: Position, value: HsvColor):
         if _is_position_out_of_range(index, (0, 0), self.dimensions):
             raise ValueError(
                 f"Position {index} is out of matrix boundreis - {self.max_x, self.max_y}")
@@ -87,7 +87,7 @@ class Canvas:
     def dimensions(self) -> Position:
         return (self.max_x, self.max_y)
 
-    def __setitem__(self, index: Position, value: HsvColour):
+    def __setitem__(self, index: Position, value: HsvColor):
         if _is_position_out_of_range(index, (0, 0), self.dimensions):
             raise ValueError(
                 f"Position {index} is out of canvas boundreis - {self.max_x, self.max_y}")
