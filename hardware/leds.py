@@ -75,9 +75,10 @@ class Canvas:
             raise ValueError("Canvas arguments can't be negative")
 
         bottom_right_corner = add_positions(top_left_corner, width_heigth)
-        if any(v > matrix.dimensions for v in (*top_left_corner, *bottom_right_corner)):
-            raise ValueError(
-                f"Invalid canvas dimensions: {top_left_corner} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")
+        for corner in (top_left_corner, bottom_right_corner):
+            if any(corner[i] > matrix.dimensions[i] for i in (0, 1)):
+                raise ValueError(
+                    f"Invalid canvas dimensions: {top_left_corner} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")
 
         self._matrix = matrix
         self.width_heigth = width_heigth
