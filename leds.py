@@ -1,9 +1,10 @@
 import neopixel
 
-from .common import Position, HsvColor, RgbColor
+from .common import add_positions, Position, HsvColor, RgbColor
 
 
-def _is_position_out_of_range(pos: Position, top_left: Position, bottom_right: Position) -> bool:
+def _is_position_out_of_range(pos: Position, top_left: Position, width_heigth: Position) -> bool:
+    bottom_right = add_positions(top_left, width_heigth)
     return any(pos[i] not in range(top_left[i], bottom_right[i]) for i in (0, 1))
 
 
@@ -69,22 +70,23 @@ class DualMatrix:
 
 
 class Canvas:
-    def __init__(self, matrix: DualMatrix, top_left_corner: Position, bottom_right_corner: Position):
-        if _is_position_out_of_range(top_left_corner, (0, 0), bottom_right_corner) or _is_position_out_of_range(bottom_right_corner, top_left_corner, matrix.dimensions):
-            raise ValueError(
-                f"Invalid canvas dimensions {top_left_corner, bottom_right_corner} for matrix dimensions {matrix.dimensions}")
-        self._matrix = matrix
-        self.top_left_corner = top_left_corner
-        self.bottom_right_corner = bottom_right_corner
-        self.max_x, self.max_y = [self.bottom_right_corner[i] - self.top_left_corner[i] for i in (0, 1)]
+    def __init__(self, matrix: DualMatrix, top_left_corner: Position, width_heigth: Position):
+        if any(v < 0 for v in (*top_left_corner, *width_heigth)):
+            raise ValueError("Canvas arguments can't be negative")
 
-    @property
-    def dimensions(self) -> Position:
-        return (self.max_x, self.max_y)
+        bottom_right_corner = add_positions(top_left_corner, width_heigth)
+        if any(v > matrix.dimensions for v in (*top_left_corner, *bottom_right_corner)):
+            raise ValueError(
+                f"Invalid canvas dimensions: {top_left_corner} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")
+
+        self._matrix = matrix
+        self.width_heigth = width_heigth
+        self.top_left_corner = top_left_corner
 
     def __setitem__(self, index: Position, value: HsvColor):
-        if _is_position_out_of_range(index, (0, 0), self.dimensions):
+        if _is_position_out_of_range(index, (0, 0), self.width_heigth):
             raise ValueError(
-                f"Position {index} is out of canvas boundreis - {self.max_x, self.max_y}")
-        self._matrix[[index[i] + self.top_left_corner[i] for i in (0, 1)]] = value
+                f"Position {index} is out of canvas boundreis - {self.width_heigth}")
 
+        self._matrix[[index[i] + self.top_left_corner[i]
+                      for i in (0, 1)]] = value
