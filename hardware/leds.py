@@ -1,6 +1,6 @@
 import neopixel
 
-from .common import add_positions, Position, HsvColor, RgbColor
+from common.common import add_positions, Position, HsvColor, RgbColor
 
 
 def _is_position_out_of_range(pos: Position, top_left: Position, width_heigth: Position) -> bool:
