@@ -65,8 +65,8 @@ class DualMatrix:
     def clear(self):
         self._leds.fill((0, 0, 0))
 
-    def create_canvas(self, top_left_corner: Position, bottom_right_corner: Position) -> 'Canvas':
-        return Canvas(self, top_left_corner, bottom_right_corner)
+    def create_canvas(self, top_left_corner: Position, width_heigth: Position) -> 'Canvas':
+        return Canvas(self, top_left_corner, width_heigth)
 
 
 class Canvas:
