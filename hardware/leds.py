@@ -1,3 +1,5 @@
+from itertools import product
+
 import neopixel
 
 from common.common import add_positions, Position, HsvColor, RgbColor
@@ -82,6 +84,8 @@ class Canvas:
 
         self._matrix = matrix
         self.width_heigth = width_heigth
+        self.width, self.height = self.width_heigth
+
         self.top_left_corner = top_left_corner
 
     def __setitem__(self, index: Position, value: HsvColor):
@@ -91,3 +95,7 @@ class Canvas:
 
         self._matrix[[index[i] + self.top_left_corner[i]
                       for i in (0, 1)]] = value
+
+    def fill(self, color: HsvColor):
+        for i, j in product(range(self.width), range(self.height)):
+            self[i, j] = color
