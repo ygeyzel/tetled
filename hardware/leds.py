@@ -1,6 +1,5 @@
 from itertools import product
-
-import neopixel
+from rpi_ws281x import PixelStrip, Color
 
 from common.common import add_positions, Position, HsvColor, RgbColor
 
@@ -29,17 +28,18 @@ def _hsv_to_rgb(hsv: HsvColor) -> RgbColor:
     rgb0 = rgb0_by_h0[int(h0) - 1]
     r, g, b = [int((color + m) * 255) for color in rgb0]
 
-    return r, g, b
+    return Color(r, g, b)
 
 
 class DualMatrix:
-    def __init__(self, din_pin, matrix_max_x: int, matrix_max_y: int):
+    def __init__(self, din_pin: int, matrix_max_x: int, matrix_max_y: int):
         self.matrix_max_x = matrix_max_x
         self.max_y = matrix_max_y
         self.max_x = matrix_max_x * 2
         self.leds_num = self.max_x * self.max_y
 
-        self._leds = neopixel.NeoPixel(din_pin, self.leds_num)
+        self._leds = PixelStrip(self.leds_num, din_pin)
+        self._leds.begin()
 
     @property
     def dimensions(self) -> Position:
@@ -65,10 +65,13 @@ class DualMatrix:
         self._leds[linear_position] = rgb
 
     def clear(self):
-        self._leds.fill((0, 0, 0))
+        self._leds[:] = Color(0, 0, 0)
 
     def create_canvas(self, top_left_corner: Position, width_heigth: Position) -> 'Canvas':
         return Canvas(self, top_left_corner, width_heigth)
+
+    def show(self):
+        self._leds.show()
 
 
 class Canvas:
