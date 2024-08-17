@@ -38,14 +38,25 @@ class Drawer:
                 )
         )
 
+    def _draw_board_bricks(self):
+        for i, j in product(range(self._board.width), range(self._board.height)):
+            self._board_canvas[i, j] = BRICK_COLOR_HSV if self._board.board[j][i] else (0, 0, 0)
+
     def _draw_board_borders(self):
         for canvas in self._board_external_border_canvases:
             canvas.fill((20, 0.5, 0.3))
 
+    def _draw_board_current_block(self):
+        block = self._board.current_block
+        for i, j in product(*map(range, block.size())):
+            if block.shape[i][j]:
+                position = add_positions(self._board.current_block_pos, (i, j))
+                self._board_canvas[position] = block.color
+
     def draw_board(self):
+        self._draw_board_bricks()
         self._draw_board_borders()
-        for i, j in product(range(self._board.width), range(self._board.height)):
-            self._board_canvas[i, j] = BRICK_COLOR_HSV if self._board.board[j][i] else (0, 0, 0)
+        self._draw_board_current_block()
 
     def show(self):
         self._matrix.show()

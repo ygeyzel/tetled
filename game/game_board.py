@@ -1,35 +1,40 @@
 import math
-import random
 import os
 
-from common.common import HsvColor
+from random import choice, getrandbits
+from typing import Optional
+
+from common.common import add_positions
 
 BEST_SCORE_FILE_NAME = "best_score"
 BRICKS_VAL = 0.2
 
-block_shapes = [
-    # T
+BLOCK_SHAPES = {
+    'T':
     ([[0, 1, 0],
      [1, 1, 1]], (0, 1, BRICKS_VAL)),
-    # L
+    'L':
     ([[1, 0],
      [1, 0],
      [1, 1]], (20, 1, BRICKS_VAL)),
-    # S
+    'S':
     ([[0, 1, 1],
      [1, 1, 0]], (100, 1, BRICKS_VAL)),
-    # O
+    'Z':
+    ([[1, 1, 0],
+     [0, 1, 1]], (50, 1, BRICKS_VAL)),
+    'O':
     ([[1, 1],
      [1, 1]], (200, 1, BRICKS_VAL)),
-    # I
+    'I':
     ([[1], [1], [1], [1]], (250, 1, BRICKS_VAL))
-]
+}
 
 
 class Board:
     """Board representation"""
 
-    def __init__(self, height, width):
+    def __init__(self, width, height):
         self.height = height
         self.width = width
         self.dimensions = (width, height)
@@ -78,11 +83,11 @@ class Board:
 
         pos = self.current_block_pos
         if direction == "left":
-            new_pos = [pos[0], pos[1] - 1]
+            new_pos = add_positions(pos, (-1, 0))
         elif direction == "right":
-            new_pos = [pos[0], pos[1] + 1]
+            new_pos = add_positions(pos, (1, 0))
         elif direction == "down":
-            new_pos = [pos[0] + 1, pos[1]]
+            new_pos = add_positions(pos, (0, 1))
         else:
             raise ValueError("wrong directions")
 
@@ -137,7 +142,8 @@ class Board:
         for row in range(size[0]):
             for col in range(size[1]):
                 if self.current_block.shape[row][col] == 1:
-                    self.board[self.current_block_pos[0] + row][self.current_block_pos[1] + col] = 1
+                    self.board[self.current_block_pos[0] +
+                               row][self.current_block_pos[1] + col] = 1
 
     def _burn(self):
         """Remove matched lines"""
@@ -193,10 +199,10 @@ class Board:
     def _get_new_block():
         """Get random block"""
 
-        block = Block(random.randint(0, len(block_shapes) - 1))
+        block = Block()
 
         # flip it randomly
-        if random.getrandbits(1):
+        if getrandbits(1):
             block.flip()
 
         return block
@@ -205,8 +211,11 @@ class Board:
 class Block:
     """Block representation"""
 
-    def __init__(self, block_index):
-        self.shape, self.color = block_shapes[block_index]
+    def __init__(self, block_shape: Optional[str] = None):
+        if block_shape is None:
+            block_shape = choice(list(BLOCK_SHAPES))
+            
+        self.shape, self.color = BLOCK_SHAPES[block_shape]
 
     def flip(self):
         self.shape = list(map(list, self.shape[::-1]))
