@@ -13,5 +13,6 @@ def matrix_test(test):
             matrix.clear()
             matrix.show()
 
+    print(test.__name__)
     return _matrix_test
 
