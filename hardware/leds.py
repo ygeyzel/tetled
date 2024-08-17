@@ -1,4 +1,6 @@
 from itertools import product
+from typing import Optional, Sequence
+
 from rpi_ws281x import PixelStrip, Color
 
 from common.common import add_positions, Position, HsvColor, RgbColor
@@ -102,3 +104,17 @@ class Canvas:
     def fill(self, color: HsvColor):
         for i, j in product(range(self.width), range(self.height)):
             self[i, j] = color
+
+    def draw_color_map(self, color_map: Sequence[Sequence[Optional[HsvColor]]], position: Position = (0, 0)):
+        for i, line in enumerate(color_map):
+            for j, color in enumerate(line):
+                if color:
+                    color_pos = add_positions(position, (i, j))
+                    self[color_pos] = color
+
+    def draw_shape(self, shape: Sequence[Sequence[bool]], color: HsvColor, position: Position = (0, 0)):
+        def shape_iterator():
+            for i in shape:
+                yield (color if j else None for j in i)
+
+        self.draw_color_map(shape_iterator(), position)

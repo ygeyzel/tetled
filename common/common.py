@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import NewType, Tuple
+from typing import NewType, Sequence, Tuple
 
 
 BOARD_WIDTH = 10
@@ -11,5 +10,10 @@ HsvColor = NewType('HsvColor', Tuple[int, int, int])
 RgbColor = NewType('RgbColor', Tuple[int, int, int])
 
 
-def add_positions(p0: Position, p1: Position) -> Position:
-    return tuple(p0[i] + p1[i] for i in (0,1))
+def add_positions(*positions: Sequence[Position]) -> Position:
+    x, y = 0, 0
+    for pos in positions:
+        x += pos[0]
+        y += pos[1]
+
+    return x, y
