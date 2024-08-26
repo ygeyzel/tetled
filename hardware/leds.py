@@ -7,8 +7,8 @@ from common.common import add_positions, Position, HsvColor, RgbColor
 
 
 def _is_position_out_of_range(pos: Position, pos0: Position, width_heigth: Position) -> bool:
-    bottom_right = add_positions(pos0, width_heigth)
-    return any(pos[i] not in range(pos0[i], bottom_right[i]) for i in (0, 1))
+    pos1 = add_positions(pos0, width_heigth)
+    return any(pos[i] not in range(pos0[i], pos1[i]) for i in (0, 1))
 
 
 def _hsv_to_rgb(hsv: HsvColor) -> RgbColor:
@@ -43,8 +43,14 @@ class DualMatrix:
         self._leds = PixelStrip(self.leds_num, din_pin)
         self._leds.begin()
 
+    # for external usage
     @property
     def dimensions(self) -> Position:
+        return (self.max_y, self.max_x)
+    
+    # for internal usage
+    @property
+    def _dimensions(self) -> Position:
         return (self.max_x, self.max_y)
 
     def _get_linear_position(self, position: Position) -> int:
@@ -59,7 +65,7 @@ class DualMatrix:
         return x + (y * self.matrix_max_x)
 
     def __setitem__(self, index: Position, value: HsvColor):
-        if _is_position_out_of_range(index, (0, 0), self.dimensions):
+        if _is_position_out_of_range(index, (0, 0), self._dimensions):
             raise ValueError(
                 f"Position {index} is out of matrix boundreis - {self.max_x, self.max_y}")
         linear_position = self._get_linear_position(index)
@@ -81,8 +87,8 @@ class Canvas:
         if any(v < 0 for v in (*pos0, *width_heigth)):
             raise ValueError("Canvas arguments can't be negative")
 
-        bottom_right_corner = add_positions(pos0, width_heigth)
-        for corner in (pos0, bottom_right_corner):
+        end_pos = add_positions(pos0, width_heigth)
+        for corner in (pos0, end_pos):
             if any(corner[i] > matrix.dimensions[i] for i in (0, 1)):
                 raise ValueError(
                     f"Invalid canvas dimensions: {pos0} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")

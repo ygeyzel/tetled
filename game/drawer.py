@@ -1,17 +1,17 @@
 from itertools import product
 
 from game.game_board import Board
-from common.common import add_positions
+from common.common import add_positions, BOARD_HEIGHT, BOARD_WIDTH
 from hardware.leds import DualMatrix
 
 
-BOARD_TOP_LEFT_POS = (3, 8)
+BOARD_POS_0 = (8, 2)
 SINGLE_MATRIX_WIDTH = 8
 MATRIX_HEIGHT = 32
 MATRIX_DPIN = 18
 
-NEXT_CELL_TOP_LEFT_POS = (4, 1)
-NEXT_CELL_HEIGHT_WIDTH = (8, 7)
+NEXT_CELL_POS_0 = (1, 4)
+NEXT_CELL_HEIGHT_WIDTH = (7, 8)
 
 
 BRICK_COLOR_HSV = (100, 1, 0.1)
@@ -19,41 +19,24 @@ BORDER_COLOR_HSV = (20, 0.5, 0.3)
 
 
 class Drawer:
-    def __init__(self, game_board: Board):
+    def __init__(self):
         self._matrix = DualMatrix(
             MATRIX_DPIN, SINGLE_MATRIX_WIDTH, MATRIX_HEIGHT)
-        self._board = game_board
+        board = Board(BOARD_HEIGHT, BOARD_WIDTH)
 
         self._board_canvas = self._matrix.create_canvas(
-            BOARD_TOP_LEFT_POS,  game_board.dimensions)
+            BOARD_POS_0,  add_positions(board.dimensions, (1, 2)))
 
         self._next_cell_canvas = self._matrix.create_canvas(
-            NEXT_CELL_TOP_LEFT_POS, NEXT_CELL_HEIGHT_WIDTH)
+            NEXT_CELL_POS_0, NEXT_CELL_HEIGHT_WIDTH)
 
-        left_border_canvas_args = (
-            add_positions(BOARD_TOP_LEFT_POS, (-1, 0)), (1, game_board.height))
-        rigth_border_canvas_args = (
-            add_positions(BOARD_TOP_LEFT_POS, (game_board.width, 0)),
-            (1, game_board.height))
-        bottom_border_canvas_args = (
-            add_positions(BOARD_TOP_LEFT_POS,
-                          add_positions((0, game_board.height), (-1, 0))), (game_board.width + 2, 1))
-
-        self._board_external_border_canvases = tuple(
-            self._matrix.create_canvas(top_left, width_heigth)
-            for top_left, width_heigth in (
-                left_border_canvas_args, rigth_border_canvas_args, bottom_border_canvas_args
-            )
-        )
+        self._board = board
 
     def _draw_board_bricks(self):
-        for i, j in product(range(self._board.width), range(self._board.height)):
-            self._board_canvas[i, j] = BRICK_COLOR_HSV if self._board.board[j][i] else (
-                0, 0, 0)
+        self._board_canvas.draw_shape(self._board.board, BRICK_COLOR_HSV, (0, 1))
 
     def _draw_board_borders(self):
-        for canvas in self._board_external_border_canvases:
-            canvas.fill(BORDER_COLOR_HSV)
+        pass
 
     def _draw_board_current_block(self):
         if block := self._board.current_block:

@@ -30,24 +30,25 @@ board_pos_0 = [
 ]
 
 
-board = Board(10, 20)
-drawer = Drawer(board)
+drawer = Drawer()
 
 
 @matrix_test
 def test_draw_board(*args, **kwargs):
+    board = drawer._board
+
     current_block = Block('Z')
     next_block = Block('T')
 
     board.board = board_pos_0
     board.current_block = current_block
-    board.current_block_pos = (6, 12)
+    board.current_block_pos = (12, 6)
     board.next_block = next_block
 
     for _ in range(5):
         drawer._matrix.clear()
 
-        board.current_block_pos = add_positions(board.current_block_pos, (0, 1))
+        board.current_block_pos = add_positions(board.current_block_pos, (1, 0))
         drawer.draw_board()
         drawer.show()
 
@@ -56,7 +57,9 @@ def test_draw_board(*args, **kwargs):
 
 @matrix_test
 def test_draw_next_shape(*args, **kwargs):
+    board = drawer._board
     board.board = [[0 for _ in range(board.width)] for _ in range(board.height)]
+
     for shape in BLOCK_SHAPES:
         print(f"\t{shape}")
         drawer._matrix.clear()
@@ -69,5 +72,5 @@ def test_draw_next_shape(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    test_draw_next_shape(matrix=drawer._matrix)
+    # test_draw_next_shape(matrix=drawer._matrix)
     test_draw_board(matrix=drawer._matrix)

@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import NewType, Sequence, Tuple
 
 
@@ -11,9 +12,4 @@ RgbColor = NewType('RgbColor', Tuple[int, int, int])
 
 
 def add_positions(*positions: Sequence[Position]) -> Position:
-    x, y = 0, 0
-    for pos in positions:
-        x += pos[0]
-        y += pos[1]
-
-    return x, y
+    return reduce(lambda p0, p1: (p0[0] + p1[0], p0[1] + p1[1]), positions)
