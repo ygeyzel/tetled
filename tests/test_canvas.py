@@ -5,7 +5,7 @@ from tests.shared import matrix_test
     
 @matrix_test
 def test_canvas(matrix):
-    canvas = matrix.create_canvas((3, 3), (10, 10))
+    canvas = matrix.create_canvas((1, 3), (10, 5))
     x, y = canvas.width_heigth
 
     print("drawing template on canvas")
@@ -17,5 +17,41 @@ def test_canvas(matrix):
     matrix.show()
 
 
+@matrix_test
+def test_draw_color_map(matrix):
+    canvas = matrix.create_canvas((1, 1), (10, 10))
+    c0, c1, c2, c3 = None, (40, 1, 0.1), (0, 0, 0.1), (120, 1, 0.1)
+
+    color_map = [
+        [c1, c2, c0],
+        [c0, c2, c0],
+        [c0, c2, c3]
+    ]
+
+    canvas.draw_color_map(color_map)
+    canvas.draw_color_map(color_map, (4, 1))
+
+    matrix.show()
+
+
+@matrix_test
+def test_draw_shape(matrix):
+    canvas = matrix.create_canvas((1, 1), (10, 10))
+    c0, c1 = (40, 1, 0.1), (120, 1, 0.1)
+
+    shape = [
+        [1, 1, 0],
+        [0, 1, 0],
+        [0, 1, 1]
+    ]
+
+    canvas.draw_shape(shape, c0)
+    canvas.draw_shape(shape, c1, (4, 1))
+
+    matrix.show()
+
+
 if __name__ == "__main__":
     test_canvas()
+    test_draw_color_map()
+    test_draw_shape()

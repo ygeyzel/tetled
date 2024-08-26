@@ -6,9 +6,9 @@ from rpi_ws281x import PixelStrip, Color
 from common.common import add_positions, Position, HsvColor, RgbColor
 
 
-def _is_position_out_of_range(pos: Position, top_left: Position, width_heigth: Position) -> bool:
-    bottom_right = add_positions(top_left, width_heigth)
-    return any(pos[i] not in range(top_left[i], bottom_right[i]) for i in (0, 1))
+def _is_position_out_of_range(pos: Position, pos0: Position, width_heigth: Position) -> bool:
+    bottom_right = add_positions(pos0, width_heigth)
+    return any(pos[i] not in range(pos0[i], bottom_right[i]) for i in (0, 1))
 
 
 def _hsv_to_rgb(hsv: HsvColor) -> RgbColor:
@@ -69,37 +69,37 @@ class DualMatrix:
     def clear(self):
         self._leds[:] = Color(0, 0, 0)
 
-    def create_canvas(self, top_left_corner: Position, width_heigth: Position) -> 'Canvas':
-        return Canvas(self, top_left_corner, width_heigth)
+    def create_canvas(self, pos0: Position, width_heigth: Position) -> 'Canvas':
+        return Canvas(self, pos0, width_heigth)
 
     def show(self):
         self._leds.show()
 
 
 class Canvas:
-    def __init__(self, matrix: DualMatrix, top_left_corner: Position, width_heigth: Position):
-        if any(v < 0 for v in (*top_left_corner, *width_heigth)):
+    def __init__(self, matrix: DualMatrix, pos0: Position, width_heigth: Position):
+        if any(v < 0 for v in (*pos0, *width_heigth)):
             raise ValueError("Canvas arguments can't be negative")
 
-        bottom_right_corner = add_positions(top_left_corner, width_heigth)
-        for corner in (top_left_corner, bottom_right_corner):
+        bottom_right_corner = add_positions(pos0, width_heigth)
+        for corner in (pos0, bottom_right_corner):
             if any(corner[i] > matrix.dimensions[i] for i in (0, 1)):
                 raise ValueError(
-                    f"Invalid canvas dimensions: {top_left_corner} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")
+                    f"Invalid canvas dimensions: {pos0} + {width_heigth} is outside matrix dimensions {matrix.dimensions}")
 
         self._matrix = matrix
         self.width_heigth = width_heigth
         self.width, self.height = self.width_heigth
 
-        self.top_left_corner = top_left_corner
+        self.pos0 = pos0
 
     def __setitem__(self, index: Position, value: HsvColor):
         if _is_position_out_of_range(index, (0, 0), self.width_heigth):
             raise ValueError(
                 f"Position {index} is out of canvas boundreis - {self.width_heigth}")
 
-        self._matrix[[index[i] + self.top_left_corner[i]
-                      for i in (0, 1)]] = value
+        self._matrix[[index[i] + self.pos0[i]
+                      for i in (1, 0)]] = value
 
     def fill(self, color: HsvColor):
         for i, j in product(range(self.width), range(self.height)):
