@@ -1,5 +1,3 @@
-from itertools import product
-
 from game.game_board import Board
 from common.common import add_positions, BOARD_HEIGHT, BOARD_WIDTH
 from hardware.leds import DualMatrix
@@ -32,27 +30,13 @@ class Drawer:
 
         self._board = board
 
-    def _draw_board_bricks(self):
-        self._board_canvas.draw_shape(self._board.board, BRICK_COLOR_HSV, (0, 1))
-
-    def _draw_board_borders(self):
-        pass
-
     def _draw_board_current_block(self):
         if block := self._board.current_block:
             self._board_canvas.draw_shape(
                 block.shape, block.color, self._board.current_block_pos)
 
     def _draw_next_block_cell(self):
-        horizonal_border = [[1 for _ in range(NEXT_CELL_HEIGHT_WIDTH[1])]]
-        vertical_border = [[1] for _ in range(NEXT_CELL_HEIGHT_WIDTH[0])]
-
-        self._next_cell_canvas.draw_shape(vertical_border, BORDER_COLOR_HSV)
-        self._next_cell_canvas.draw_shape(
-            vertical_border, BORDER_COLOR_HSV, (0, NEXT_CELL_HEIGHT_WIDTH[1] - 1))
-        self._next_cell_canvas.draw_shape(horizonal_border, BORDER_COLOR_HSV)
-        self._next_cell_canvas.draw_shape(
-            horizonal_border, BORDER_COLOR_HSV, (NEXT_CELL_HEIGHT_WIDTH[0] - 1, 0))
+        self._next_cell_canvas.draw_borders(BORDER_COLOR_HSV)
 
         if block := self._board.next_block:
             pos_in_cell = tuple(int((cell_dim - shape_dim) / 2) for cell_dim,
@@ -60,8 +44,8 @@ class Drawer:
             self._next_cell_canvas.draw_shape(block.shape, block.color, pos_in_cell)
 
     def draw_board(self):
-        self._draw_board_bricks()
-        self._draw_board_borders()
+        self._board_canvas.draw_shape(self._board.board, BRICK_COLOR_HSV, (0, 1))
+        self._board_canvas.draw_borders(BORDER_COLOR_HSV, "ulb")
         self._draw_board_current_block()
         self._draw_next_block_cell()
 

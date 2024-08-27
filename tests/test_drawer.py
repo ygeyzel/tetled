@@ -68,9 +68,9 @@ def test_draw_next_shape(*args, **kwargs):
         drawer.draw_board()
         drawer.show()
 
-        sleep(0.2)
+        sleep(0.3)
 
 
 if __name__ == "__main__":
-    # test_draw_next_shape(matrix=drawer._matrix)
+    test_draw_next_shape(matrix=drawer._matrix)
     test_draw_board(matrix=drawer._matrix)

@@ -51,7 +51,18 @@ def test_draw_shape(matrix):
     matrix.show()
 
 
+@matrix_test
+def test_draw_borders(matrix):
+    canvas = matrix.create_canvas((1, 3), (10, 5))
+    
+    canvas.draw_borders((40, 1, 0.1), "ur")
+    canvas.draw_borders((120, 1, 0.1), "lb")
+
+    matrix.show()
+
+
 if __name__ == "__main__":
     test_canvas()
     test_draw_color_map()
     test_draw_shape()
+    test_draw_borders()

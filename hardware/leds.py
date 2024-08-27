@@ -124,3 +124,19 @@ class Canvas:
                 yield (color if j else None for j in i)
 
         self.draw_color_map(shape_iterator(), position)
+
+    def draw_borders(self, color: HsvColor, borders: str="urlb"):
+        vertical_line = [[1 for _ in range(self.height)]]
+        horizonal_line = [[1] for _ in range(self.width)]
+
+        shape_and_position_map = {
+            "u": (horizonal_line, (0, 0)),
+            "r": (vertical_line, (0, 0)),
+            "l": (vertical_line, (self.width - 1, 0)),
+            "b": (horizonal_line, (0, self.height - 1)),
+        }
+
+        for border in borders:
+            shape, position = shape_and_position_map[border]
+            self.draw_shape(shape, color, position)
+
