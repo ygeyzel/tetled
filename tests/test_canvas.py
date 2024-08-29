@@ -2,11 +2,21 @@ from itertools import product
 
 from tests.shared import matrix_test
 
+
+OO = None
+C0 = (120, 0.2, 0.1)
+C1 = (120, 0.7, 0.1)
+C2 = (120, 1, 0.1)
+
+color_map = [
+    [C0, C1, OO],
+    [OO, C1, C2]
+]
     
 @matrix_test
 def test_canvas(matrix):
-    canvas = matrix.create_canvas((1, 3), (10, 5))
-    x, y = canvas.width_heigth
+    canvas = matrix.create_canvas((1, 3), (10, 6))
+    x, y = canvas.dimensions
 
     print("drawing template on canvas")
     for i,j in product(range(x), range(y)):
@@ -53,7 +63,7 @@ def test_draw_shape(matrix):
 
 @matrix_test
 def test_draw_borders(matrix):
-    canvas = matrix.create_canvas((1, 3), (10, 5))
+    canvas = matrix.create_canvas((1, 3), (10, 8))
     
     canvas.draw_borders((40, 1, 0.1), "ur")
     canvas.draw_borders((120, 1, 0.1), "lb")

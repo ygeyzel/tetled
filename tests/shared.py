@@ -8,11 +8,12 @@ def matrix_test(test):
 
         try:
             matrix.clear()
+            matrix.show()
             test(matrix)
             input("Press Enter to continue\n")
         finally:
-            matrix.clear()
             print("clear canvas")
+            matrix.clear()
             matrix.show()
 
     return _matrix_test

@@ -2,9 +2,7 @@ from functools import reduce
 from typing import NewType, Sequence, Tuple
 
 
-BOARD_WIDTH = 10
-BOARD_HEIGHT = 20
-BOARD_DIMS = (BOARD_WIDTH, BOARD_HEIGHT)
+BOARD_DIMS = (20, 10)
 
 Position = NewType('Position', Tuple[int, int])
 HsvColor = NewType('HsvColor', Tuple[int, int, int])

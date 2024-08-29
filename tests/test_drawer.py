@@ -1,31 +1,31 @@
 from time import sleep
+from unittest.mock import Mock
 
-from common.common import add_positions
 from tests.shared import matrix_test
 from game.drawer import Drawer
-from game.game_board import Board, Block, BLOCK_SHAPES
+from game.game_board import Block, BLOCK_SHAPES, Direction
 
 
 board_pos_0 = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 1], 
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
     [0, 0, 0, 0, 1, 1, 1, 0, 0, 1]
 ]
 
@@ -36,6 +36,7 @@ drawer = Drawer()
 @matrix_test
 def test_draw_board(*args, **kwargs):
     board = drawer._board
+    board._block_reach_bottom = Mock()
 
     current_block = Block('Z')
     next_block = Block('T')
@@ -45,20 +46,20 @@ def test_draw_board(*args, **kwargs):
     board.current_block_pos = (12, 6)
     board.next_block = next_block
 
-    for _ in range(5):
+    drawer.draw_board()
+    for dr in (Direction.LEFT, Direction.DOWN, Direction.RIGHT, Direction.DOWN, Direction.DOWN):
+        sleep(0.3)
         drawer._matrix.clear()
 
-        board.current_block_pos = add_positions(board.current_block_pos, (1, 0))
+        board.move_block(dr)
+        print(f"\t{dr.name}")
         drawer.draw_board()
-        drawer.show()
 
-        sleep(0.3)
 
 
 @matrix_test
 def test_draw_next_shape(*args, **kwargs):
     board = drawer._board
-    board.board = [[0 for _ in range(board.width)] for _ in range(board.height)]
 
     for shape in BLOCK_SHAPES:
         print(f"\t{shape}")
@@ -66,7 +67,6 @@ def test_draw_next_shape(*args, **kwargs):
 
         board.next_block = Block(shape)
         drawer.draw_board()
-        drawer.show()
 
         sleep(0.3)
 

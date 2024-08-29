@@ -1,5 +1,5 @@
 from game.game_board import Board
-from common.common import add_positions, BOARD_HEIGHT, BOARD_WIDTH
+from common.common import add_positions, BOARD_DIMS
 from hardware.leds import DualMatrix
 
 
@@ -20,10 +20,10 @@ class Drawer:
     def __init__(self):
         self._matrix = DualMatrix(
             MATRIX_DPIN, SINGLE_MATRIX_WIDTH, MATRIX_HEIGHT)
-        board = Board(BOARD_HEIGHT, BOARD_WIDTH)
+        board = Board(BOARD_DIMS)
 
         self._board_canvas = self._matrix.create_canvas(
-            BOARD_POS_0,  add_positions(board.dimensions, (1, 2)))
+            BOARD_POS_0,  add_positions(board.dimensions_for_canvas(), (1, 2)))
 
         self._next_cell_canvas = self._matrix.create_canvas(
             NEXT_CELL_POS_0, NEXT_CELL_HEIGHT_WIDTH)
@@ -48,6 +48,8 @@ class Drawer:
         self._board_canvas.draw_borders(BORDER_COLOR_HSV, "ulb")
         self._draw_board_current_block()
         self._draw_next_block_cell()
+
+        self.show()
 
     def show(self):
         self._matrix.show()

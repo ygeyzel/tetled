@@ -1,10 +1,15 @@
 import math
 import os
 
+from enum import Enum
+from functools import partial
+from itertools import product
 from random import choice, getrandbits
 from typing import Optional
 
 from common.common import add_positions
+from hardware.keys import Key
+
 
 BEST_SCORE_FILE_NAME = "best_score"
 BRICKS_VAL = 0.2
@@ -31,13 +36,17 @@ BLOCK_SHAPES = {
 }
 
 
+class Direction(Enum):
+    DOWN = (1, 0)
+    LEFT = (0, -1)
+    RIGHT = (0, 1)
+
+
 class Board:
     """Board representation"""
 
-    def __init__(self, width, height):
-        self.height = height
-        self.width = width
-        self.dimensions = (width, height)
+    def __init__(self, dimensions):
+        self.dimensions = dimensions
         self.board = self._get_new_board()
 
         self.current_block_pos = None
@@ -49,6 +58,9 @@ class Board:
         self.lines = None
         self.best_score = None
         self.level = None
+
+    def dimensions_for_canvas(self):
+        return self.dimensions
 
     def start(self):
         """Start game"""
@@ -78,25 +90,31 @@ class Board:
         if self._can_move(self.current_block_pos, rotated_shape):
             self.current_block.shape = rotated_shape
 
-    def move_block(self, direction):
+    def advance_turn(self, key: Key):
+        key_func_swich = {
+            Key.NO_KEY: partial(self.move_block, Direction.DOWN),
+            Key.LEFT: partial(self.move_block, Direction.LEFT),
+            Key.RIGHT: partial(self.move_block, Direction.RIGHT),
+            Key.UP: self.rotate_block,
+            Key.DOWN: self.drop
+        }
+        key_func_swich[key]()
+
+    def move_block(self, direction: Direction):
         """Try to move block"""
 
         pos = self.current_block_pos
-        if direction == "left":
-            new_pos = add_positions(pos, (-1, 0))
-        elif direction == "right":
-            new_pos = add_positions(pos, (1, 0))
-        elif direction == "down":
-            new_pos = add_positions(pos, (0, 1))
-        else:
-            raise ValueError("wrong directions")
+        new_pos = add_positions(pos, direction.value)
 
         if self._can_move(new_pos, self.current_block.shape):
             self.current_block_pos = new_pos
-        elif direction == "down":
-            self._land_block()
-            self._burn()
-            self._place_new_block()
+        elif direction == Direction.DOWN:
+            self._block_reach_bottom()
+
+    def _block_reach_bottom(self):
+        self._land_block()
+        self._burn()
+        self._place_new_block()
 
     def drop(self):
         """Move to very very bottom"""
@@ -104,16 +122,12 @@ class Board:
         i = 1
         while self._can_move((self.current_block_pos[0] + 1, self.current_block_pos[1]), self.current_block.shape):
             i += 1
-            self.move_block("down")
-
-        self._land_block()
-        self._burn()
-        self._place_new_block()
-
+            self.move_block(Direction.DOWN)
+        
     def _get_new_board(self):
         """Create new empty board"""
 
-        return [[0 for _ in range(self.width)] for _ in range(self.height)]
+        return [[0 for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
 
     def _place_new_block(self):
         """Place new block and generate the next one"""
@@ -126,7 +140,7 @@ class Board:
             self.next_block = self._get_new_block()
 
         size = Block.get_size(self.current_block.shape)
-        col_pos = math.floor((self.width - size[1]) / 2)
+        col_pos = math.floor((self.dimensions[1] - size[1]) / 2)
         self.current_block_pos = [0, col_pos]
 
         if self._check_overlapping(self.current_block_pos, self.current_block.shape):
@@ -148,11 +162,11 @@ class Board:
     def _burn(self):
         """Remove matched lines"""
 
-        for row in range(self.height):
+        for row in range(self.dimensions[0]):
             if all(col != 0 for col in self.board[row]):
                 for r in range(row, 0, -1):
                     self.board[r] = self.board[r - 1]
-                self.board[0] = [0 for _ in range(self.width)]
+                self.board[0] = [0 for _ in range(self.dimensions[1])]
                 self.score += 100
                 self.lines += 1
                 if self.lines % 10 == 0:
@@ -162,19 +176,18 @@ class Board:
         """If current block overlaps any other on the board"""
 
         size = Block.get_size(shape)
-        for row in range(size[0]):
-            for col in range(size[1]):
-                if shape[row][col] == 1:
-                    if self.board[pos[0] + row][pos[1] + col] == 1:
-                        return True
+        for row, col in product(range(size[0]), range(size[1])):
+            if shape[row][col] == 1:
+                if self.board[pos[0] + row][pos[1] + col] == 1:
+                    return True
         return False
 
     def _can_move(self, pos, shape):
         """Check if move is possible"""
 
         size = Block.get_size(shape)
-        if pos[1] < 0 or pos[1] + size[1] > self.width \
-                or pos[0] + size[0] > self.height:
+        if pos[1] < 0 or pos[1] + size[1] > self.dimensions[1] \
+                or pos[0] + size[0] > self.dimensions[0]:
             return False
 
         return not self._check_overlapping(pos, shape)
