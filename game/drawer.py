@@ -28,23 +28,24 @@ class Drawer:
         self._next_cell_canvas = self._matrix.create_canvas(
             NEXT_CELL_POS_0, NEXT_CELL_HEIGHT_WIDTH)
 
-        self._board = board
+        self.board = board
 
     def _draw_board_current_block(self):
-        if block := self._board.current_block:
+        if block := self.board.current_block:
+            draw_pos = add_positions(self.board.current_block_pos, (0, 1))
             self._board_canvas.draw_shape(
-                block.shape, block.color, self._board.current_block_pos)
+                block.shape, block.color, draw_pos)
 
     def _draw_next_block_cell(self):
         self._next_cell_canvas.draw_borders(BORDER_COLOR_HSV)
 
-        if block := self._board.next_block:
+        if block := self.board.next_block:
             pos_in_cell = tuple(int((cell_dim - shape_dim) / 2) for cell_dim,
                                 shape_dim in zip(NEXT_CELL_HEIGHT_WIDTH, block.size()))
             self._next_cell_canvas.draw_shape(block.shape, block.color, pos_in_cell)
 
     def draw_board(self):
-        self._board_canvas.draw_shape(self._board.board, BRICK_COLOR_HSV, (0, 1))
+        self._board_canvas.draw_shape(self.board.board, BRICK_COLOR_HSV, (0, 1))
         self._board_canvas.draw_borders(BORDER_COLOR_HSV, "ulb")
         self._draw_board_current_block()
         self._draw_next_block_cell()
@@ -53,3 +54,7 @@ class Drawer:
 
     def show(self):
         self._matrix.show()
+
+    def clear(self):
+        self._matrix.clear()
+

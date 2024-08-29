@@ -35,7 +35,7 @@ drawer = Drawer()
 
 @matrix_test
 def test_draw_board(*args, **kwargs):
-    board = drawer._board
+    board = drawer.board
     board._block_reach_bottom = Mock()
 
     current_block = Block('Z')
@@ -59,7 +59,7 @@ def test_draw_board(*args, **kwargs):
 
 @matrix_test
 def test_draw_next_shape(*args, **kwargs):
-    board = drawer._board
+    board = drawer.board
 
     for shape in BLOCK_SHAPES:
         print(f"\t{shape}")

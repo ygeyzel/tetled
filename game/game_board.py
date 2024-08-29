@@ -24,7 +24,7 @@ BLOCK_SHAPES = {
      [1, 1]], (20, 1, BRICKS_VAL)),
     'S':
     ([[0, 1, 1],
-     [1, 1, 0]], (100, 1, BRICKS_VAL)),
+     [1, 1, 0]], (300, 1, BRICKS_VAL)),
     'Z':
     ([[1, 1, 0],
      [0, 1, 1]], (50, 1, BRICKS_VAL)),
@@ -92,7 +92,7 @@ class Board:
 
     def advance_turn(self, key: Key):
         key_func_swich = {
-            Key.NO_KEY: partial(self.move_block, Direction.DOWN),
+            Key.NO_KEY: lambda : None,
             Key.LEFT: partial(self.move_block, Direction.LEFT),
             Key.RIGHT: partial(self.move_block, Direction.RIGHT),
             Key.UP: self.rotate_block,
@@ -100,7 +100,10 @@ class Board:
         }
         key_func_swich[key]()
 
-    def move_block(self, direction: Direction):
+        if key == Key.DOWN or not self.move_block(Direction.DOWN):
+            self._block_reach_bottom()
+
+    def move_block(self, direction: Direction) -> bool:
         """Try to move block"""
 
         pos = self.current_block_pos
@@ -108,8 +111,9 @@ class Board:
 
         if self._can_move(new_pos, self.current_block.shape):
             self.current_block_pos = new_pos
-        elif direction == Direction.DOWN:
-            self._block_reach_bottom()
+            return True
+
+        return False
 
     def _block_reach_bottom(self):
         self._land_block()
