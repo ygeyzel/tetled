@@ -11,7 +11,7 @@ from common.common import add_positions
 from hardware.keys import Key
 
 
-BEST_SCORE_FILE_NAME = "best_score"
+BEST_SCORE_FILE_NAME = ".best_score"
 BRICKS_VAL = 0.2
 
 BLOCK_SHAPES = {

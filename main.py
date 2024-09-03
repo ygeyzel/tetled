@@ -2,6 +2,7 @@ from time import sleep
 from game.drawer import Drawer
 from game.game_board import Board
 from hardware.keys import KeyHandler
+from hardware.score import print_score
 
 
 def init_game(board: Board):
@@ -20,6 +21,7 @@ def game_loop(board: Board, drawer: Drawer):
 
         drawer.clear()
         drawer.draw_board()
+        print_score(board.score, board.best_score)
 
 
 def main():
