@@ -24,10 +24,10 @@ BLOCK_SHAPES = {
      [1, 1]], (20, 1, BRICKS_VAL)),
     'S':
     ([[0, 1, 1],
-     [1, 1, 0]], (300, 1, BRICKS_VAL)),
+     [1, 1, 0]], (220, 1, BRICKS_VAL)),
     'Z':
     ([[1, 1, 0],
-     [0, 1, 1]], (50, 1, BRICKS_VAL)),
+     [0, 1, 1]], (70, 1, BRICKS_VAL)),
     'O':
     ([[1, 1],
      [1, 1]], (200, 1, BRICKS_VAL)),
@@ -219,13 +219,7 @@ class Board:
     def _get_new_block():
         """Get random block"""
 
-        block = Block()
-
-        # flip it randomly
-        if getrandbits(1):
-            block.flip()
-
-        return block
+        return Block()
 
 
 class Block:
