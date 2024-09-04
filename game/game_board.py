@@ -131,7 +131,7 @@ class Board:
     def _get_new_board(self):
         """Create new empty board"""
 
-        return [[0 for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
+        return [[None for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
 
     def _place_new_block(self):
         """Place new block and generate the next one"""
@@ -161,16 +161,16 @@ class Board:
             for col in range(size[1]):
                 if self.current_block.shape[row][col] == 1:
                     self.board[self.current_block_pos[0] +
-                               row][self.current_block_pos[1] + col] = 1
+                               row][self.current_block_pos[1] + col] = self.current_block.color
 
     def _burn(self):
         """Remove matched lines"""
 
         for row in range(self.dimensions[0]):
-            if all(col != 0 for col in self.board[row]):
+            if all(col is not None for col in self.board[row]):
                 for r in range(row, 0, -1):
                     self.board[r] = self.board[r - 1]
-                self.board[0] = [0 for _ in range(self.dimensions[1])]
+                self.board[0] = [None for _ in range(self.dimensions[1])]
                 self.score += 100
                 self.lines += 1
                 if self.lines % 10 == 0:
@@ -182,7 +182,7 @@ class Board:
         size = Block.get_size(shape)
         for row, col in product(range(size[0]), range(size[1])):
             if shape[row][col] == 1:
-                if self.board[pos[0] + row][pos[1] + col] == 1:
+                if self.board[pos[0] + row][pos[1] + col]:
                     return True
         return False
 

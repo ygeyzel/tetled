@@ -45,7 +45,7 @@ class Drawer:
             self._next_cell_canvas.draw_shape(block.shape, block.color, pos_in_cell)
 
     def draw_board(self):
-        self._board_canvas.draw_shape(self.board.board, BRICK_COLOR_HSV, (0, 1))
+        self._board_canvas.draw_color_map(self.board.board, (0, 1))
         self._board_canvas.draw_borders(BORDER_COLOR_HSV, "ulb")
         self._draw_board_current_block()
         self._draw_next_block_cell()
