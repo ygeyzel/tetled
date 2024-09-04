@@ -5,16 +5,19 @@ from hardware.keys import Key, KeyHandler
 from hardware.score import print_score
 
 
+key_handler = KeyHandler()
+
+
 def init_game(board: Board):
     board.start()
-    KeyHandler.flush()
+    key_handler.flush()
 
 
 def game_over(drawer: Drawer):
-    KeyHandler.flush()
+    key_handler.flush()
     end_time = time()
     
-    while KeyHandler.get_key() == Key.NO_KEY or time() - end_time < 2:
+    while key_handler.get_key() == Key.NO_KEY or time() - end_time < 2:
         drawer.blink_board()
         sleep(0.2)
 
@@ -23,10 +26,10 @@ def game_loop(board: Board, drawer: Drawer):
     drawer.draw_board()
 
     while not board.is_game_over():
-        KeyHandler.flush()
+        key_handler.flush()
         sleep(1 / board.level)
 
-        key = KeyHandler.get_key()
+        key = key_handler.get_key()
         board.advance_turn(key)
 
         drawer.clear()

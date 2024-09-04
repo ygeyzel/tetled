@@ -33,4 +33,8 @@ class _KeysHandler:
         self._last_key_pressed = Key.NO_KEY
 
 
-KeyHandler = _KeysHandler()
+_key_handler = _KeysHandler()
+
+
+def KeyHandler() -> _KeysHandler:
+    return _key_handler
