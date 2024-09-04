@@ -35,6 +35,7 @@ BLOCK_SHAPES = {
     ([[1, 1, 1, 1]], (250, 1, BRICKS_VAL))
 }
 
+LINES_TO_PASS_LEVEL = 5
 
 class Direction(Enum):
     DOWN = (1, 0)
@@ -149,9 +150,10 @@ class Board:
 
         if self._check_overlapping(self.current_block_pos, self.current_block.shape):
             self.game_over = True
-            self._save_best_score()
         else:
-            self.score += 5
+            self.score += 1
+
+        self._update_best_score()
 
     def _land_block(self):
         """Put block to the board and generate a new one"""
@@ -171,9 +173,9 @@ class Board:
                 for r in range(row, 0, -1):
                     self.board[r] = self.board[r - 1]
                 self.board[0] = [None for _ in range(self.dimensions[1])]
-                self.score += 100
+                self.score += 20
                 self.lines += 1
-                if self.lines % 10 == 0:
+                if self.lines % LINES_TO_PASS_LEVEL == 0:
                     self.level += 1
 
     def _check_overlapping(self, pos, shape):
@@ -196,12 +198,13 @@ class Board:
 
         return not self._check_overlapping(pos, shape)
 
-    def _save_best_score(self):
+    def _update_best_score(self):
         """Save best score to file"""
 
         if self.best_score < self.score:
+            self.best_score = self.score
             with open(BEST_SCORE_FILE_NAME, "w") as file:
-                file.write(str(self.score))
+                file.write(str(self.best_score))
 
     @staticmethod
     def _read_best_score():

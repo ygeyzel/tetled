@@ -1,3 +1,4 @@
+from itertools import product
 from game.game_board import Board
 from common.common import add_positions, BOARD_DIMS
 from hardware.leds import DualMatrix
@@ -50,6 +51,16 @@ class Drawer:
         self._draw_board_current_block()
         self._draw_next_block_cell()
 
+        self.show()
+
+    def blink_board(self):
+        board = self.board.board
+        for i, j in product(range(len(board)), range(len(board[0]))):
+            if color := board[i][j]:
+                color = ((180 + color[0]) % 360, color[1], color[2])
+                board[i][j] = color
+
+        self._board_canvas.draw_color_map(self.board.board, (0, 1))
         self.show()
 
     def show(self):
