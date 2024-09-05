@@ -1,3 +1,4 @@
+from functools import partial
 from time import sleep, time
 from game.drawer import Drawer
 from game.game_board import Board
@@ -27,7 +28,8 @@ def game_loop(board: Board, drawer: Drawer):
 
     while not board.is_game_over():
         key_handler.flush()
-        sleep(1 / board.level)
+        dt = 1 / board.level
+        sleep(dt)
 
         key = key_handler.get_key()
         board.advance_turn(key)
@@ -42,6 +44,7 @@ def game_loop(board: Board, drawer: Drawer):
 def main():
     drawer = Drawer()
     board = drawer.board
+    board.burn_animation = drawer.burn_animation
 
     while True:
         init_game(board)

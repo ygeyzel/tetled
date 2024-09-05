@@ -1,4 +1,5 @@
 from itertools import product
+from time import sleep
 from game.game_board import Board
 from common.common import add_positions, BOARD_DIMS
 from hardware.leds import DualMatrix
@@ -62,6 +63,17 @@ class Drawer:
 
         self._board_canvas.draw_color_map(self.board.board, (0, 1))
         self.show()
+
+    def burn_animation(self, row: int):
+        self.clear()
+        self.draw_board()
+
+        row_colors = self .board.board[row] 
+        for _ in range(50):
+            row_colors = [(c[0], c[1], c[2] * 0.7) for c in row_colors]
+            self._board_canvas.draw_color_map([row_colors], (row, 1))
+            self.show()
+            sleep(0.01)
 
     def show(self):
         self._matrix.show()

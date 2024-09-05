@@ -4,7 +4,7 @@ import os
 from enum import Enum
 from functools import partial
 from itertools import product
-from random import choice, getrandbits
+from random import choice
 from typing import Optional
 
 from common.common import add_positions
@@ -37,6 +37,7 @@ BLOCK_SHAPES = {
 
 LINES_TO_PASS_LEVEL = 5
 
+
 class Direction(Enum):
     DOWN = (1, 0)
     LEFT = (0, -1)
@@ -59,6 +60,8 @@ class Board:
         self.lines = None
         self.best_score = None
         self.level = None
+
+        self.burn_animation = None
 
     def dimensions_for_canvas(self):
         return self.dimensions
@@ -170,8 +173,12 @@ class Board:
 
         for row in range(self.dimensions[0]):
             if all(col is not None for col in self.board[row]):
+                if self.burn_animation:
+                    self.burn_animation(row)
+
                 for r in range(row, 0, -1):
                     self.board[r] = self.board[r - 1]
+
                 self.board[0] = [None for _ in range(self.dimensions[1])]
                 self.score += 20
                 self.lines += 1
