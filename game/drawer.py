@@ -14,8 +14,8 @@ NEXT_CELL_POS_0 = (1, 4)
 NEXT_CELL_HEIGHT_WIDTH = (7, 8)
 
 
-BRICK_COLOR_HSV = (100, 1, 0.1)
-BORDER_COLOR_HSV = (20, 0.5, 0.3)
+BORDER_COLOR_HSV = (20, 0, 0.05)
+NEXT_CELL_BORDER_COLOR_HSV = (20, 0, 0.05)
 
 
 class Drawer:
@@ -39,7 +39,7 @@ class Drawer:
                 block.shape, block.color, draw_pos)
 
     def _draw_next_block_cell(self):
-        self._next_cell_canvas.draw_borders(BORDER_COLOR_HSV)
+        self._next_cell_canvas.draw_borders(NEXT_CELL_BORDER_COLOR_HSV)
 
         if block := self.board.next_block:
             pos_in_cell = tuple(int((cell_dim - shape_dim) / 2) for cell_dim,

@@ -12,16 +12,16 @@ from hardware.keys import Key
 
 
 BEST_SCORE_FILE_NAME = ".best_score"
-BRICKS_VAL = 0.2
+BRICKS_VAL = 0.1
 
 BLOCK_SHAPES = {
     'T':
     ([[0, 1, 0],
-     [1, 1, 1]], (0, 1, BRICKS_VAL)),
+     [1, 1, 1]], (0, 0.9, BRICKS_VAL)),
     'L':
     ([[1, 0],
      [1, 0],
-     [1, 1]], (20, 1, BRICKS_VAL)),
+     [1, 1]], (20, 0.9, BRICKS_VAL)),
     'S':
     ([[0, 1, 1],
      [1, 1, 0]], (220, 1, BRICKS_VAL)),
@@ -30,9 +30,9 @@ BLOCK_SHAPES = {
      [0, 1, 1]], (70, 1, BRICKS_VAL)),
     'O':
     ([[1, 1],
-     [1, 1]], (200, 1, BRICKS_VAL)),
+     [1, 1]], (100, 1, BRICKS_VAL)),
     'I':
-    ([[1, 1, 1, 1]], (250, 1, BRICKS_VAL))
+    ([[1, 1, 1, 1]], (250, 0.8, BRICKS_VAL))
 }
 
 LINES_TO_PASS_LEVEL = 5
@@ -154,7 +154,7 @@ class Board:
         if self._check_overlapping(self.current_block_pos, self.current_block.shape):
             self.game_over = True
         else:
-            self.score += 1
+            self.score += 3
 
         self._update_best_score()
 
@@ -168,11 +168,20 @@ class Board:
                     self.board[self.current_block_pos[0] +
                                row][self.current_block_pos[1] + col] = self.current_block.color
 
+    def _level_advancing(self, lines: int):
+        self.lines += lines
+        levels = int(self.lines / LINES_TO_PASS_LEVEL)
+        self.level += levels
+        self.lines %= LINES_TO_PASS_LEVEL
+
     def _burn(self):
         """Remove matched lines"""
 
+        lines = 0
         for row in range(self.dimensions[0]):
             if all(col is not None for col in self.board[row]):
+                lines += 1
+
                 if self.burn_animation:
                     self.burn_animation(row)
 
@@ -180,10 +189,9 @@ class Board:
                     self.board[r] = self.board[r - 1]
 
                 self.board[0] = [None for _ in range(self.dimensions[1])]
-                self.score += 20
-                self.lines += 1
-                if self.lines % LINES_TO_PASS_LEVEL == 0:
-                    self.level += 1
+                self.score += 30 * lines
+        
+        self._level_advancing(lines)
 
     def _check_overlapping(self, pos, shape):
         """If current block overlaps any other on the board"""
