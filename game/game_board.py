@@ -90,9 +90,14 @@ class Board:
 
     def rotate_block(self):
         rotated_shape = list(map(list, zip(*self.current_block.shape[::-1])))
+        pos_shift = (
+            int((len(self.current_block.shape) - len(self.current_block.shape[0])) / 2),
+            int((len(self.current_block.shape[0]) - len(self.current_block.shape)) / 2)
+        )
 
-        if self._can_move(self.current_block_pos, rotated_shape):
+        if self._can_move(add_positions(self.current_block_pos, pos_shift), rotated_shape):
             self.current_block.shape = rotated_shape
+            self.current_block_pos = add_positions(pos_shift, self.current_block_pos)
 
     def advance_turn(self, key: Key):
         key_func_swich = {
@@ -248,9 +253,6 @@ class Block:
 
     def flip(self):
         self.shape = list(map(list, self.shape[::-1]))
-
-    def _get_rotated(self):
-        return list(map(list, zip(*self.shape[::-1])))
 
     def size(self):
         """Get size of the block"""
