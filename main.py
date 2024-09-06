@@ -27,7 +27,6 @@ def game_loop(board: Board, drawer: Drawer):
     drawer.draw_board()
 
     while not board.is_game_over():
-        key_handler.flush()
         dt = 1 / board.level
         sleep(dt)
 
