@@ -1,9 +1,8 @@
-from functools import partial
 from time import sleep, time
 from game.drawer import Drawer
 from game.game_board import Board
 from hardware.keys import Key, KeyHandler
-from hardware.score import print_score
+from hardware.score import ScoreDisplay, with_score_display
 
 
 key_handler = KeyHandler()
@@ -23,7 +22,7 @@ def game_over(drawer: Drawer):
         sleep(0.2)
 
 
-def game_loop(board: Board, drawer: Drawer):
+def game_loop(score_display: ScoreDisplay, board: Board, drawer: Drawer):
     drawer.draw_board()
 
     while not board.is_game_over():
@@ -35,19 +34,20 @@ def game_loop(board: Board, drawer: Drawer):
 
         drawer.clear()
         drawer.draw_board()
-        print_score(board.score, board.best_score)
+        score_display.send_score(board.score, board.best_score)
 
     game_over(drawer)
 
 
-def main():
+@with_score_display
+def main(score_display: ScoreDisplay):
     drawer = Drawer()
     board = drawer.board
     board.burn_animation = drawer.burn_animation
 
     while True:
         init_game(board)
-        game_loop(board, drawer)
+        game_loop(score_display, board, drawer)
 
 
 if __name__ == "__main__":

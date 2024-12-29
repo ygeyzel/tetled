@@ -1,18 +1,39 @@
-from luma.led_matrix.device import max7219
-from luma.core.interface.serial import spi, noop
-from luma.core.virtual import sevensegment
+import serial
+import time
+from functools import wraps
 
 
-SEGMENT_LENGTH = 8
+class ScoreDisplay:
+    def __init__(self, port="/dev/ttyUSB0", baudrate=115200, timeout=1):
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.serial = None
+    
+    def __enter__(self):
+        self.serial = serial.Serial(
+            port=self.port,
+            baudrate=self.baudrate,
+            timeout=self.timeout
+        )
+        # Allow ESP32 to initialize
+        time.sleep(2)
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.serial and self.serial.is_open:
+            self.serial.close()
+    
+    def send_score(self, score, highest):
+        message = f"{score} {highest}\r\n"
+        self.serial.write(message.encode())
+        # Wait for data to be written
+        self.serial.flush()
 
 
-_serial = spi(port=0, device=0, gpio=noop())
-_device = max7219(_serial, cascaded=2)
-_seg = sevensegment(_device)
-
-
-def print_score(score: int, best_score: int):
-    score, best_score = str(score), str(best_score)
-    text = ['0' * (SEGMENT_LENGTH - len(s)) + s for s in (score, best_score)]
-
-    _seg.text = text[0] + text[1]
+def with_score_display(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with ScoreDisplay() as score_display:
+            return func(score_display, *args, **kwargs)
+    return wrapper
