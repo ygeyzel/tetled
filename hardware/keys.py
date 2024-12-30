@@ -9,8 +9,8 @@ class Key(Enum):
     NO_KEY = None
     UP = 26
     DOWN = 23
-    LEFT = 25
-    RIGHT = 22
+    LEFT = 4
+    RIGHT = 12
 
 
 class _KeysHandler:
