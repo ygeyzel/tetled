@@ -232,7 +232,9 @@ class Board:
 
         if os.path.exists(f"./{BEST_SCORE_FILE_NAME}"):
             with open(BEST_SCORE_FILE_NAME) as file:
-                return int(file.read())
+                value = file.read()
+                if value.isdigit():
+                    return int(value)
         return 0
 
     @staticmethod

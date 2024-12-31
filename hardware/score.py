@@ -25,10 +25,13 @@ class ScoreDisplay:
             self.serial.close()
     
     def send_score(self, score, highest):
-        message = f"{score} {highest}\r\n"
-        self.serial.write(message.encode())
-        # Wait for data to be written
-        self.serial.flush()
+        try:
+            message = f"{score} {highest}\r\n"
+            self.serial.write(message.encode())
+            # Wait for data to be written
+            self.serial.flush()
+        except serial.SerialException:
+            pass
 
 
 def with_score_display(func):
